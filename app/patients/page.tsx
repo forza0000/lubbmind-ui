@@ -199,7 +199,7 @@ export default function Patients() {
                   <SelectTrigger className="col-span-3">
                     <SelectValue placeholder="اختر الحالة" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50">
                     <SelectItem value="Active">نشط</SelectItem>
                     <SelectItem value="Inactive">غير نشط</SelectItem>
                     <SelectItem value="Pending">في الانتظار</SelectItem>
@@ -231,23 +231,23 @@ export default function Patients() {
           <TableCaption>قائمة بجميع المرضى المسجلين في النظام</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">رقم الملف</TableHead>
-              <TableHead className="text-right">اسم المريض</TableHead>
-              <TableHead className="text-right">العمر</TableHead>
-              <TableHead className="text-right">رقم الهاتف</TableHead>
-              <TableHead className="text-right">آخر زيارة</TableHead>
-              <TableHead className="text-right">الحالة</TableHead>
+              <TableHead className="text-right w-[100px]">رقم الملف</TableHead>
+              <TableHead className="text-right min-w-[150px]">اسم المريض</TableHead>
+              <TableHead className="text-right w-[80px]">العمر</TableHead>
+              <TableHead className="text-right w-[140px]">رقم الهاتف</TableHead>
+              <TableHead className="text-right w-[120px]">آخر زيارة</TableHead>
+              <TableHead className="text-right w-[100px]">الحالة</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredPatients.map((patient) => (
               <TableRow key={patient.id}>
-                <TableCell className="font-medium">{patient.fileNumber}</TableCell>
-                <TableCell>{patient.name}</TableCell>
-                <TableCell>{patient.age} سنة</TableCell>
-                <TableCell>{patient.phone}</TableCell>
-                <TableCell>{patient.lastVisit}</TableCell>
-                <TableCell>
+                <TableCell className="font-medium text-right">{patient.fileNumber}</TableCell>
+                <TableCell className="text-right">{patient.name}</TableCell>
+                <TableCell className="text-right">{patient.age} سنة</TableCell>
+                <TableCell className="text-right">{patient.phone}</TableCell>
+                <TableCell className="text-right">{patient.lastVisit}</TableCell>
+                <TableCell className="text-right">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(patient.status)}`}>
                     {patient.status === "Active" && "نشط"}
                     {patient.status === "Inactive" && "غير نشط"}
