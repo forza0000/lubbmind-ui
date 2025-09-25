@@ -43,6 +43,7 @@ export default function AddAppointmentModal({
   const [formData, setFormData] = useState({
     patientName: "",
     patientPhone: "",
+    doctorName: "",
     appointmentDate: undefined as Date | undefined,
     appointmentTime: "",
     appointmentType: "",
@@ -57,6 +58,16 @@ export default function AddAppointmentModal({
     { id: "P002", name: "فاطمة سالم", phone: "0987654321" },
     { id: "P003", name: "محمد أحمد", phone: "0555123456" },
     { id: "P004", name: "سارة علي", phone: "0666789012" },
+  ];
+
+  // Available doctors (in real app, this would come from API)
+  const availableDoctors = [
+    { id: "D001", name: "د. سارة أحمد", specialty: "طب عام", available: true },
+    { id: "D002", name: "د. محمد حسن", specialty: "طب الأطفال", available: true },
+    { id: "D003", name: "د. نورا علي", specialty: "طب النساء", available: true },
+    { id: "D004", name: "د. أحمد محمود", specialty: "طب القلب", available: true },
+    { id: "D005", name: "د. فاطمة سالم", specialty: "طب الجلدية", available: false },
+    { id: "D006", name: "د. خالد عبدالله", specialty: "طب العيون", available: true },
   ];
 
   // Available time slots
@@ -88,6 +99,7 @@ export default function AddAppointmentModal({
       id: appointmentId,
       patientName: formData.patientName,
       patientPhone: formData.patientPhone,
+      doctorName: formData.doctorName,
       date: formData.appointmentDate,
       time: formData.appointmentTime,
       type: formData.appointmentType,
@@ -106,6 +118,7 @@ export default function AddAppointmentModal({
     setFormData({
       patientName: "",
       patientPhone: "",
+      doctorName: "",
       appointmentDate: undefined,
       appointmentTime: "",
       appointmentType: "",
@@ -129,18 +142,20 @@ export default function AddAppointmentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <CalendarIcon className="h-5 w-5 text-lubbmind-600" />
-            تحديد موعد جديد
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl w-[95vw] max-h-[95vh] overflow-y-auto p-0">
+        <div className="p-6">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
+              <CalendarIcon className="h-6 w-6 text-lubbmind-600" />
+              تحديد موعد جديد
+            </DialogTitle>
+          </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Patient Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <User className="h-5 w-5 text-lubbmind-600" />
               معلومات المريض
             </h3>
             
@@ -184,9 +199,46 @@ export default function AddAppointmentModal({
             </div>
           </div>
 
+          {/* Doctor Selection */}
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <User className="h-5 w-5 text-green-600" />
+              اختيار الطبيب
+            </h3>
+            
+            <div className="space-y-2">
+              <Label>الطبيب المعالج *</Label>
+              <Select
+                value={formData.doctorName}
+                onValueChange={(value) => setFormData({ ...formData, doctorName: value })}
+              >
+                <SelectTrigger>
+                  <User className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="اختر الطبيب المعالج" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableDoctors
+                    .filter(doctor => doctor.available)
+                    .map((doctor) => (
+                      <SelectItem key={doctor.id} value={doctor.name}>
+                        <div className="flex flex-col">
+                          <span>{doctor.name}</span>
+                          <span className="text-sm text-gray-500">{doctor.specialty}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-gray-500">
+                يتم عرض الأطباء المتاحين فقط
+              </p>
+            </div>
+          </div>
+
           {/* Appointment Details */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5 text-blue-600" />
               تفاصيل الموعد
             </h3>
             
@@ -302,8 +354,9 @@ export default function AddAppointmentModal({
           </div>
 
           {/* Additional Notes */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <User className="h-5 w-5 text-purple-600" />
               ملاحظات إضافية
             </h3>
             
@@ -319,7 +372,7 @@ export default function AddAppointmentModal({
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 pt-6 border-t bg-white dark:bg-gray-900 sticky bottom-0">
             <Button type="button" variant="outline" onClick={handleClose}>
               إلغاء
             </Button>
@@ -331,6 +384,7 @@ export default function AddAppointmentModal({
             </Button>
           </DialogFooter>
         </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

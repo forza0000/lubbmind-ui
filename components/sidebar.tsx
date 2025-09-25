@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import RoleSwitcher from "@/components/RoleSwitcher"
 import {
   LayoutDashboard,
   Users,
   Calendar,
   FileText,
+  Pill,
   Menu,
   X
 } from "lucide-react"
@@ -30,6 +32,11 @@ const navigation = [
     name: "Appointments",
     href: "/appointments",
     icon: Calendar,
+  },
+  {
+    name: "Prescriptions",
+    href: "/prescriptions",
+    icon: Pill,
   },
   {
     name: "Reports",
@@ -105,6 +112,11 @@ export function Sidebar() {
               )
             })}
           </nav>
+
+          {/* Role Switcher */}
+          <div className="p-4 border-t border-border">
+            <RoleSwitcher />
+          </div>
         </div>
       </div>
     </>

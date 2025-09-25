@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import AddPrescriptionModal from "@/components/modals/AddPrescriptionModal";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Pill, 
   Search, 
@@ -25,9 +27,12 @@ import {
   Activity
 } from "lucide-react";
 
-export default function Prescriptions() {
+export default function PrescriptionsPage() {
+  const { hasPermission } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [prescriptions, setPrescriptions] = useState(mockPrescriptions);
 
   const prescriptionStats = [
     {
@@ -64,7 +69,7 @@ export default function Prescriptions() {
     }
   ];
 
-  const prescriptions = [
+  const mockPrescriptions = [
     {
       id: "RX001",
       patientName: "أحمد محمد علي",
@@ -152,11 +157,34 @@ export default function Prescriptions() {
     }
   };
 
+  // Handle prescription creation
+  const handleCreatePrescription = (prescriptionData: any) => {
+    const newPrescription = {
+      id: `RX${String(prescriptions.length + 1).padStart(3, '0')}`,
+      patientId: prescriptionData.patientId,
+      patientName: prescriptionData.patientName,
+      doctorName: prescriptionData.doctorName,
+      date: new Date().toLocaleDateString('ar-SA'),
+      time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+      status: "قيد المراجعة",
+      medications: prescriptionData.medications,
+      diagnosis: prescriptionData.diagnosis,
+      notes: prescriptionData.notes
+    };
+    
+    setPrescriptions([newPrescription, ...prescriptions]);
+    setIsAddModalOpen(false);
+  };
+
+  // Filter prescriptions based on search term and status
   const filteredPrescriptions = prescriptions.filter(prescription => {
     const matchesSearch = prescription.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         prescription.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         prescription.doctorName.toLowerCase().includes(searchTerm.toLowerCase());
+      prescription.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.medications.some(med => med.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    
     const matchesStatus = selectedStatus === "all" || prescription.status === selectedStatus;
+    
     return matchesSearch && matchesStatus;
   });
 
@@ -181,10 +209,15 @@ export default function Prescriptions() {
             <Download className="h-4 w-4" />
             تصدير
           </Button>
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            وصفة جديدة
-          </Button>
+          {hasPermission('canCreatePrescriptions') && (
+             <Button 
+               className="flex items-center gap-2"
+               onClick={() => setIsAddModalOpen(true)}
+             >
+               <Plus className="h-4 w-4" />
+               وصفة جديدة
+             </Button>
+           )}
         </div>
       </div>
 
@@ -370,10 +403,16 @@ export default function Prescriptions() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full justify-start" variant="outline">
-              <FileText className="h-4 w-4 mr-2" />
-              إنشاء وصفة جديدة
-            </Button>
+            {hasPermission('canCreatePrescriptions') && (
+               <Button 
+                 className="w-full justify-start" 
+                 variant="outline"
+                 onClick={() => setIsAddModalOpen(true)}
+               >
+                 <FileText className="h-4 w-4 mr-2" />
+                 إنشاء وصفة جديدة
+               </Button>
+             )}
             <Button className="w-full justify-start" variant="outline">
               <Search className="h-4 w-4 mr-2" />
               البحث في الأدوية
@@ -431,6 +470,13 @@ export default function Prescriptions() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Prescription Modal */}
+       <AddPrescriptionModal 
+         isOpen={isAddModalOpen}
+         onClose={() => setIsAddModalOpen(false)}
+         onSubmit={handleCreatePrescription}
+       />
     </div>
   );
 }

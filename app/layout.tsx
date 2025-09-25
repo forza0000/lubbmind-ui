@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { I18nProvider } from "@/components/providers/i18n-provider";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -37,9 +38,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <SidebarProvider>
-              {children}
-            </SidebarProvider>
+            <AuthProvider>
+              <SidebarProvider>
+                {children}
+              </SidebarProvider>
+            </AuthProvider>
           </ThemeProvider>
         </I18nProvider>
       </body>

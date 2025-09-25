@@ -58,23 +58,32 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{currentLanguage.name}</span>
-          <span className="sm:hidden">{currentLanguage.flag}</span>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          <Globe className="h-4 w-4 text-lubbmind-600" />
+          <span className="hidden sm:inline font-medium">{currentLanguage.name}</span>
+          <span className="sm:hidden text-lg">{currentLanguage.flag}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-48">
         {languages.map((language) => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => handleLanguageChange(language)}
-            className={`cursor-pointer ${
-              currentLanguage.code === language.code ? "bg-accent" : ""
+            className={`cursor-pointer flex items-center gap-3 p-3 transition-colors ${
+              currentLanguage.code === language.code 
+                ? "bg-lubbmind-50 dark:bg-lubbmind-900/20 text-lubbmind-700 dark:text-lubbmind-300" 
+                : "hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
-            <span className="mr-2">{language.flag}</span>
-            {language.name}
+            <span className="text-lg">{language.flag}</span>
+            <span className="font-medium">{language.name}</span>
+            {currentLanguage.code === language.code && (
+              <span className="ml-auto text-lubbmind-600">✓</span>
+            )}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

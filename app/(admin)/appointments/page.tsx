@@ -162,7 +162,7 @@ export default function Appointments() {
       id: (appointments.length + 1).toString(),
       appointmentId: `A${String(appointments.length + 1).padStart(3, '0')}`,
       patientName: appointmentData.patientName,
-      doctorName: appointmentData.doctorName || "د. طبيب عام",
+      doctorName: appointmentData.doctorName,
       date: appointmentData.date ? appointmentData.date.toISOString().split('T')[0] : "",
       time: appointmentData.time,
       status: "Scheduled"
@@ -220,14 +220,14 @@ export default function Appointments() {
         <div className="flex gap-2">
           <Button onClick={() => setIsAddAppointmentModalOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            إضافة موعد جديد
+            موعد مفصل
           </Button>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
-                إضافة موعد (بسيط)
+                موعد سريع
               </Button>
             </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
@@ -264,13 +264,21 @@ export default function Appointments() {
                 <Label htmlFor="doctor" className="text-right">
                   اسم الطبيب
                 </Label>
-                <Input
-                  id="doctor"
+                <Select
                   value={newAppointment.doctorName}
-                  onChange={(e) => setNewAppointment({...newAppointment, doctorName: e.target.value})}
-                  className="col-span-3"
-                  placeholder="د. اسم الطبيب"
-                />
+                  onValueChange={(value) => setNewAppointment({...newAppointment, doctorName: value})}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="اختر الطبيب" />
+                  </SelectTrigger>
+                  <SelectContent className="z-50">
+                    <SelectItem value="د. سارة أحمد">د. سارة أحمد - طب عام</SelectItem>
+                    <SelectItem value="د. محمد حسن">د. محمد حسن - طب الأطفال</SelectItem>
+                    <SelectItem value="د. نورا علي">د. نورا علي - طب النساء</SelectItem>
+                    <SelectItem value="د. أحمد محمود">د. أحمد محمود - طب القلب</SelectItem>
+                    <SelectItem value="د. خالد عبدالله">د. خالد عبدالله - طب العيون</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
                 <Label htmlFor="date" className="text-right">

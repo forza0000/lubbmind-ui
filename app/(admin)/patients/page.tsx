@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import AddPatientModal from "@/components/modals/AddPatientModal";
 import { 
   Search, 
   UserPlus, 
@@ -18,14 +19,30 @@ import {
   Filter,
   Download,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Edit,
+  Eye,
+  Trash2
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Patients() {
   const { t } = useTranslation();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
+
+  const handleAddPatient = (patientData: any) => {
+    console.log("New patient data:", patientData);
+    // Here you would typically send the data to your backend API
+    // For now, we'll just log it
+  };
 
   const patients = [
     {
@@ -85,11 +102,50 @@ export default function Patients() {
     }
   ];
 
-  const filteredPatients = patients.filter(patient =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Enhanced search functionality
+  const filteredPatients = patients.filter(patient => {
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase().trim();
+    return (
+      patient.name.toLowerCase().includes(searchLower) ||
+      patient.id.toLowerCase().includes(searchLower) ||
+      patient.condition.toLowerCase().includes(searchLower) ||
+      patient.phone.includes(searchTerm.trim()) ||
+      patient.email.toLowerCase().includes(searchLower) ||
+      patient.status.toLowerCase().includes(searchLower) ||
+      patient.gender.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // CSV Export functionality
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Name', 'Age', 'Gender', 'Phone', 'Email', 'Last Visit', 'Condition', 'Status'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredPatients.map(patient => [
+        patient.id,
+        `"${patient.name}"`,
+        patient.age,
+        patient.gender,
+        patient.phone,
+        patient.email,
+        patient.lastVisit,
+        `"${patient.condition}"`,
+        patient.status
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `patients_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const toggleRowExpansion = (patientId: string) => {
     const newExpandedRows = new Set(expandedRows);
@@ -105,26 +161,45 @@ export default function Patients() {
     router.push(`/patients/${patientId}`);
   };
 
+  const handleEditPatient = (patientId: string) => {
+    // TODO: Implement edit functionality
+    alert(`تحرير بيانات المريض ${patientId}`);
+  };
+
+  const handleDeletePatient = (patientId: string) => {
+    // TODO: Implement delete functionality
+    if (confirm('هل أنت متأكد من حذف هذا المريض؟')) {
+      alert(`حذف المريض ${patientId}`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            إدارة المرضى
+            {t('patientManagement')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             إدارة ملفات المرضى ومعلوماتهم الطبية
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={handleExportCSV}
+          >
             <Download className="h-4 w-4" />
-            تصدير البيانات
+            {t('export')}
           </Button>
-          <Button className="flex items-center gap-2">
+          <Button 
+            className="flex items-center gap-2"
+            onClick={() => setIsAddPatientModalOpen(true)}
+          >
             <UserPlus className="h-4 w-4" />
-            إضافة مريض جديد
+            {t('addPatient')}
           </Button>
         </div>
       </div>
@@ -224,12 +299,12 @@ export default function Patients() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">المريض</th>
-                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">رقم المريض</th>
-                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">رقم الهاتف</th>
-                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">آخر زيارة</th>
-                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">الحالة</th>
-                    <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">الإجراءات</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">{t('patientName')}</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">{t('id')}</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">{t('phone')}</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">{t('lastVisit')}</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">{t('status')}</th>
+                    <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -264,14 +339,35 @@ export default function Patients() {
                             className="text-xs"
                             onClick={() => handleViewPatientFile(patient.id)}
                           >
-                            عرض الملف
+                            {t('viewFile')}
                           </Button>
                           <Button size="sm" variant="outline" className="text-xs">
-                            موعد
+                            {t('appointments')}
                           </Button>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleViewPatientFile(patient.id)}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                عرض التفاصيل
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEditPatient(patient.id)}>
+                                <Edit className="h-4 w-4 mr-2" />
+                                تحرير
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDeletePatient(patient.id)}
+                                className="text-red-600 dark:text-red-400"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                حذف
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </td>
                     </tr>
@@ -304,6 +400,30 @@ export default function Patients() {
                       <Badge variant={patient.status === "نشط" ? "default" : "secondary"}>
                         {patient.status}
                       </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="p-2">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleViewPatientFile(patient.id)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            عرض التفاصيل
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditPatient(patient.id)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            تحرير
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDeletePatient(patient.id)}
+                            className="text-red-600 dark:text-red-400"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            حذف
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -369,6 +489,13 @@ export default function Patients() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Patient Modal */}
+      <AddPatientModal
+        isOpen={isAddPatientModalOpen}
+        onClose={() => setIsAddPatientModalOpen(false)}
+        onSubmit={handleAddPatient}
+      />
     </div>
   );
 }

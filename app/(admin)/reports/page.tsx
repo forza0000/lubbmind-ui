@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth, withPermission } from "@/contexts/AuthContext";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -19,8 +20,141 @@ import {
   Clock
 } from "lucide-react";
 
-export default function Reports() {
+function ReportsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
+
+  // Sample data for calculations (in real app, this would come from API/database)
+  const sampleAppointments = [
+    { id: "A001", patientName: "أحمد محمد علي", doctorName: "د. سارة أحمد", date: "2024-01-20", time: "09:30", status: "Completed", type: "فحص دوري", actualStartTime: "09:35", waitTime: 5, satisfaction: 5 },
+    { id: "A002", patientName: "فاطمة عبدالله", doctorName: "د. محمد حسن", date: "2024-01-20", time: "10:00", status: "Completed", type: "استشارة", actualStartTime: "10:15", waitTime: 15, satisfaction: 4 },
+    { id: "A003", patientName: "محمد سعد الدين", doctorName: "د. نورا علي", date: "2024-01-21", time: "14:30", status: "Scheduled", type: "متابعة", actualStartTime: null, waitTime: null, satisfaction: null },
+    { id: "A004", patientName: "نورا حسن", doctorName: "د. أحمد محمود", date: "2024-01-19", time: "11:00", status: "Cancelled", type: "فحص أولي", actualStartTime: null, waitTime: null, satisfaction: null },
+    { id: "A005", patientName: "خالد إبراهيم", doctorName: "د. سارة أحمد", date: "2024-01-18", time: "16:00", status: "Completed", type: "استشارة", actualStartTime: "16:10", waitTime: 10, satisfaction: 5 },
+    { id: "A006", patientName: "مريم سالم", doctorName: "د. محمد حسن", date: "2024-01-17", time: "09:00", status: "Completed", type: "فحص دوري", actualStartTime: "09:20", waitTime: 20, satisfaction: 3 },
+    { id: "A007", patientName: "عبدالله أحمد", doctorName: "د. نورا علي", date: "2024-01-16", time: "13:30", status: "Completed", type: "متابعة", actualStartTime: "13:25", waitTime: -5, satisfaction: 5 },
+    { id: "A008", patientName: "ليلى محمود", doctorName: "د. أحمد محمود", date: "2024-01-15", time: "15:00", status: "No-Show", type: "فحص أولي", actualStartTime: null, waitTime: null, satisfaction: null }
+  ];
+
+  const samplePatients = [
+    { id: "P001", name: "أحمد محمد علي", phone: "0501234567", email: "ahmed@example.com", gender: "ذكر", age: 35, status: "نشط", lastVisit: "2024-01-20", returnVisit: true },
+    { id: "P002", name: "فاطمة عبدالله", phone: "0507654321", email: "fatima@example.com", gender: "أنثى", age: 28, status: "نشط", lastVisit: "2024-01-20", returnVisit: false },
+    { id: "P003", name: "محمد سعد الدين", phone: "0509876543", email: "mohammed@example.com", gender: "ذكر", age: 42, status: "نشط", lastVisit: "2024-01-10", returnVisit: true },
+    { id: "P004", name: "نورا حسن", phone: "0502468135", email: "nora@example.com", gender: "أنثى", age: 31, status: "غير نشط", lastVisit: "2024-01-05", returnVisit: false }
+  ];
+
+  // Dynamic calculations
+  const analyticsData = useMemo(() => {
+    const totalAppointments = sampleAppointments.length;
+    const completedAppointments = sampleAppointments.filter(a => a.status === "Completed");
+    const scheduledAppointments = sampleAppointments.filter(a => a.status === "Scheduled");
+    const noShowAppointments = sampleAppointments.filter(a => a.status === "No-Show");
+    
+    // Attendance rate calculation
+    const attendanceRate = totalAppointments > 0 ? 
+      Math.round(((completedAppointments.length / (totalAppointments - scheduledAppointments.length)) * 100)) : 0;
+    
+    // Average wait time calculation
+    const waitTimes = completedAppointments.filter(a => a.waitTime !== null).map(a => a.waitTime);
+    const avgWaitTime = waitTimes.length > 0 ? 
+      Math.round(waitTimes.reduce((sum, time) => sum + time, 0) / waitTimes.length) : 0;
+    
+    // Patient satisfaction calculation
+    const satisfactionRatings = completedAppointments.filter(a => a.satisfaction !== null).map(a => a.satisfaction);
+    const avgSatisfaction = satisfactionRatings.length > 0 ? 
+      (satisfactionRatings.reduce((sum, rating) => sum + rating, 0) / satisfactionRatings.length).toFixed(1) : "0.0";
+    
+    // Return rate calculation
+    const returnPatients = samplePatients.filter(p => p.returnVisit).length;
+    const returnRate = samplePatients.length > 0 ? 
+      Math.round((returnPatients / samplePatients.length) * 100) : 0;
+
+    return [
+      {
+        title: "معدل الحضور",
+        value: `${attendanceRate}%`,
+        change: "+5%",
+        trend: "up",
+        description: "من إجمالي المواعيد المحجوزة"
+      },
+      {
+        title: "متوسط وقت الانتظار",
+        value: `${avgWaitTime} دقيقة`,
+        change: "-3 دقائق",
+        trend: "down",
+        description: "تحسن في إدارة الوقت"
+      },
+      {
+        title: "رضا المرضى",
+        value: `${avgSatisfaction}/5`,
+        change: "+0.2",
+        trend: "up",
+        description: "بناءً على التقييمات الأخيرة"
+      },
+      {
+        title: "معدل العودة",
+        value: `${returnRate}%`,
+        change: "+8%",
+        trend: "up",
+        description: "المرضى الذين عادوا للعيادة"
+      }
+    ];
+  }, []);
+
+  // CSV Export Functions
+  const exportToCSV = (data: any[], filename: string) => {
+    if (data.length === 0) return;
+    
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportReports = () => {
+    const reportData = [
+      { reportType: "تقرير المرضى", totalCount: samplePatients.length, activeCount: samplePatients.filter(p => p.status === "نشط").length },
+      { reportType: "تقرير المواعيد", totalCount: sampleAppointments.length, completedCount: sampleAppointments.filter(a => a.status === "Completed").length },
+      { reportType: "معدل الحضور", value: analyticsData[0].value },
+      { reportType: "متوسط وقت الانتظار", value: analyticsData[1].value },
+      { reportType: "رضا المرضى", value: analyticsData[2].value },
+      { reportType: "معدل العودة", value: analyticsData[3].value }
+    ];
+    exportToCSV(reportData, 'تقرير_شامل_العيادة');
+  };
+
+  const handleViewReport = (reportId: string) => {
+    switch(reportId) {
+      case "patients":
+        exportToCSV(samplePatients, 'تقرير_المرضى');
+        break;
+      case "appointments":
+        exportToCSV(sampleAppointments, 'تقرير_المواعيد');
+        break;
+      case "prescriptions":
+        // This would be implemented when we have prescription data
+        alert("سيتم تنفيذ تقرير الوصفات قريباً");
+        break;
+      case "revenue":
+        // This would be implemented when we have revenue data
+        alert("سيتم تنفيذ تقرير الإيرادات قريباً");
+        break;
+    }
+  };
+
+  const handleDownloadReport = (reportId: string) => {
+    handleViewReport(reportId); // For now, download and view do the same thing
+  };
 
   const reportTypes = [
     {
@@ -96,36 +230,7 @@ export default function Reports() {
     }
   ];
 
-  const analyticsData = [
-    {
-      title: "معدل الحضور",
-      value: "87%",
-      change: "+5%",
-      trend: "up",
-      description: "من إجمالي المواعيد المحجوزة"
-    },
-    {
-      title: "متوسط وقت الانتظار",
-      value: "12 دقيقة",
-      change: "-3 دقائق",
-      trend: "down",
-      description: "تحسن في إدارة الوقت"
-    },
-    {
-      title: "رضا المرضى",
-      value: "4.8/5",
-      change: "+0.2",
-      trend: "up",
-      description: "بناءً على التقييمات الأخيرة"
-    },
-    {
-      title: "معدل العودة",
-      value: "73%",
-      change: "+8%",
-      trend: "up",
-      description: "المرضى الذين عادوا للعيادة"
-    }
-  ];
+
 
   return (
     <div className="space-y-6">
@@ -144,7 +249,7 @@ export default function Reports() {
             <Filter className="h-4 w-4" />
             تصفية
           </Button>
-          <Button className="flex items-center gap-2">
+          <Button onClick={handleExportReports} className="flex items-center gap-2">
             <Download className="h-4 w-4" />
             تصدير التقارير
           </Button>
@@ -203,11 +308,11 @@ export default function Reports() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => handleViewReport(report.id)}>
                         <Eye className="h-4 w-4 mr-1" />
                         عرض
                       </Button>
-                      <Button size="sm">
+                      <Button size="sm" onClick={() => handleDownloadReport(report.id)}>
                         <Download className="h-4 w-4 mr-1" />
                         تحميل
                       </Button>
@@ -303,3 +408,6 @@ export default function Reports() {
     </div>
   );
 }
+
+// Export the component with permission protection
+export default withPermission(ReportsPage, 'canViewReports');

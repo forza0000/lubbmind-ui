@@ -110,18 +110,20 @@ export default function AddPatientModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <User className="h-5 w-5 text-lubbmind-600" />
-            إضافة مريض جديد
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl w-[95vw] max-h-[95vh] overflow-y-auto p-0">
+        <div className="p-6">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
+              <User className="h-6 w-6 text-lubbmind-600" />
+              إضافة مريض جديد
+            </DialogTitle>
+          </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <User className="h-5 w-5 text-lubbmind-600" />
               المعلومات الشخصية
             </h3>
             
@@ -196,8 +198,9 @@ export default function AddPatientModal({
           </div>
 
           {/* Contact Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <Phone className="h-5 w-5 text-lubbmind-600" />
               معلومات الاتصال
             </h3>
             
@@ -250,8 +253,9 @@ export default function AddPatientModal({
           </div>
 
           {/* Emergency Contact */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <Phone className="h-5 w-5 text-red-600" />
               جهة الاتصال في حالات الطوارئ
             </h3>
             
@@ -280,8 +284,9 @@ export default function AddPatientModal({
           </div>
 
           {/* Medical Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <User className="h-5 w-5 text-green-600" />
               المعلومات الطبية
             </h3>
             
@@ -321,7 +326,7 @@ export default function AddPatientModal({
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 pt-6 border-t bg-white dark:bg-gray-900 sticky bottom-0">
             <Button type="button" variant="outline" onClick={handleClose}>
               إلغاء
             </Button>
@@ -333,6 +338,7 @@ export default function AddPatientModal({
             </Button>
           </DialogFooter>
         </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
