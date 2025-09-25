@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState,useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useSidebar } from "../context/SidebarContext";
 import {
   Grid3X3,
@@ -16,36 +17,36 @@ import {
 import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
-  name: string;
+  nameKey: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  subItems?: { nameKey: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-const navItems: NavItem[] = [
+const getNavItems = (): NavItem[] => [
   {
     icon: <Grid3X3 />,
-    name: "لوحة التحكم", // Dashboard in Arabic
+    nameKey: "dashboard",
     path: "/",
   },
   {
     icon: <UserCircle />,
-    name: "المرضى", // Patients in Arabic
+    nameKey: "patients",
     path: "/patients",
   },
   {
     icon: <Calendar />,
-    name: "المواعيد", // Appointments in Arabic
+    nameKey: "appointments",
     path: "/appointments",
   },
   {
     icon: <List />,
-    name: "التقارير", // Reports in Arabic
+    nameKey: "reports",
     path: "/reports",
   },
   {
     icon: <FileText />,
-    name: "الوصفات الطبية", // Prescriptions in Arabic
+    nameKey: "prescriptions",
     path: "/prescriptions",
   },
 ];
@@ -53,8 +54,10 @@ const navItems: NavItem[] = [
 // Removed e-commerce and demo sections for clinic focus
 
 const AppSidebar: React.FC = () => {
+  const { t } = useTranslation();
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const navItems = getNavItems();
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -62,7 +65,7 @@ const AppSidebar: React.FC = () => {
   ) => (
     <ul className="flex flex-col gap-4">
       {navItems.map((nav, index) => (
-        <li key={nav.name}>
+        <li key={nav.nameKey}>
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
@@ -86,7 +89,7 @@ const AppSidebar: React.FC = () => {
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className={`menu-item-text`}>{nav.name}</span>
+                <span className={`menu-item-text`}>{t(nav.nameKey)}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDown
@@ -117,7 +120,7 @@ const AppSidebar: React.FC = () => {
                   {nav.icon}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className={`menu-item-text`}>{nav.name}</span>
+                  <span className={`menu-item-text`}>{t(nav.nameKey)}</span>
                 )}
               </Link>
             )
@@ -137,7 +140,7 @@ const AppSidebar: React.FC = () => {
             >
               <ul className="mt-2 space-y-1 ml-9">
                 {nav.subItems.map((subItem) => (
-                  <li key={subItem.name}>
+                  <li key={subItem.nameKey}>
                     <Link
                       href={subItem.path}
                       className={`menu-dropdown-item ${
@@ -146,7 +149,7 @@ const AppSidebar: React.FC = () => {
                           : "menu-dropdown-item-inactive"
                       }`}
                     >
-                      {subItem.name}
+                      {t(subItem.nameKey)}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span

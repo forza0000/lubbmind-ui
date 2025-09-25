@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { 
   Search, 
   UserPlus, 
@@ -14,11 +16,16 @@ import {
   FileText,
   MoreHorizontal,
   Filter,
-  Download
+  Download,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 export default function Patients() {
+  const { t } = useTranslation();
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const patients = [
     {
@@ -83,6 +90,20 @@ export default function Patients() {
     patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const toggleRowExpansion = (patientId: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(patientId)) {
+      newExpandedRows.delete(patientId);
+    } else {
+      newExpandedRows.add(patientId);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
+  const handleViewPatientFile = (patientId: string) => {
+    router.push(`/patients/${patientId}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -197,69 +218,154 @@ export default function Patients() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">المريض</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">رقم المريض</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">العمر</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">الجنس</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">رقم الهاتف</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">البريد الإلكتروني</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">آخر زيارة</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">الحالة الطبية</th>
-                  <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">الحالة</th>
-                  <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPatients.map((patient) => (
-                  <tr key={patient.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 bg-lubbmind-100 dark:bg-lubbmind-900 rounded-full flex items-center justify-center">
-                          <span className="text-lubbmind-600 dark:text-lubbmind-400 font-semibold">
-                            {patient.name.split(' ')[0].charAt(0)}
-                          </span>
+          {/* Desktop Table View */}
+          <div className="hidden lg:block">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">المريض</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">رقم المريض</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">رقم الهاتف</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">آخر زيارة</th>
+                    <th className="text-right p-4 font-semibold text-gray-900 dark:text-white">الحالة</th>
+                    <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPatients.map((patient) => (
+                    <tr key={patient.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 bg-lubbmind-100 dark:bg-lubbmind-900 rounded-full flex items-center justify-center">
+                            <span className="text-lubbmind-600 dark:text-lubbmind-400 font-semibold">
+                              {patient.name.split(' ')[0].charAt(0)}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-white">{patient.name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{patient.age} سنة • {patient.gender}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">{patient.name}</div>
+                      </td>
+                      <td className="p-4 text-gray-600 dark:text-gray-400">{patient.id}</td>
+                      <td className="p-4 text-gray-600 dark:text-gray-400 font-mono text-sm">{patient.phone}</td>
+                      <td className="p-4 text-gray-600 dark:text-gray-400">{patient.lastVisit}</td>
+                      <td className="p-4">
+                        <Badge variant={patient.status === "نشط" ? "default" : "secondary"}>
+                          {patient.status}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-xs"
+                            onClick={() => handleViewPatientFile(patient.id)}
+                          >
+                            عرض الملف
+                          </Button>
+                          <Button size="sm" variant="outline" className="text-xs">
+                            موعد
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
                         </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile/Tablet Card View */}
+          <div className="lg:hidden space-y-4">
+            {filteredPatients.map((patient) => (
+              <div key={patient.id} className="border border-gray-200 dark:border-gray-700 rounded-lg">
+                {/* Main Row */}
+                <div className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="h-12 w-12 bg-lubbmind-100 dark:bg-lubbmind-900 rounded-full flex items-center justify-center">
+                        <span className="text-lubbmind-600 dark:text-lubbmind-400 font-semibold text-lg">
+                          {patient.name.split(' ')[0].charAt(0)}
+                        </span>
                       </div>
-                    </td>
-                    <td className="p-4 text-gray-600 dark:text-gray-400">{patient.id}</td>
-                    <td className="p-4 text-gray-600 dark:text-gray-400">{patient.age} سنة</td>
-                    <td className="p-4 text-gray-600 dark:text-gray-400">{patient.gender}</td>
-                    <td className="p-4 text-gray-600 dark:text-gray-400 font-mono text-sm">{patient.phone}</td>
-                    <td className="p-4 text-gray-600 dark:text-gray-400 text-sm">{patient.email}</td>
-                    <td className="p-4 text-gray-600 dark:text-gray-400">{patient.lastVisit}</td>
-                    <td className="p-4 text-gray-600 dark:text-gray-400">{patient.condition}</td>
-                    <td className="p-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 dark:text-white truncate">{patient.name}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{patient.id}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{patient.phone}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Badge variant={patient.status === "نشط" ? "default" : "secondary"}>
                         {patient.status}
                       </Badge>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center justify-center gap-2">
-                        <Button size="sm" variant="outline" className="text-xs">
-                          عرض الملف
-                        </Button>
-                        <Button size="sm" variant="outline" className="text-xs">
-                          موعد
-                        </Button>
-                        <Button size="sm" variant="outline" className="text-xs">
-                          وصفة
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleRowExpansion(patient.id)}
+                        className="p-2"
+                      >
+                        {expandedRows.has(patient.id) ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Details */}
+                {expandedRows.has(patient.id) && (
+                  <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">العمر: {patient.age} سنة</span>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">الجنس: {patient.gender}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{patient.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">آخر زيارة: {patient.lastVisit}</span>
+                      </div>
+                      <div className="flex items-center gap-2 sm:col-span-2">
+                        <FileText className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">الحالة الطبية: {patient.condition}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-xs"
+                        onClick={() => handleViewPatientFile(patient.id)}
+                      >
+                        عرض الملف
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-xs">
+                        تحديد موعد
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-xs">
+                        إنشاء وصفة
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>

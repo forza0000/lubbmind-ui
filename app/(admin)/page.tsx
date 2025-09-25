@@ -1,8 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import AddPatientModal from "@/components/modals/AddPatientModal";
+import AddAppointmentModal from "@/components/modals/AddAppointmentModal";
 import { 
   Users, 
   Calendar, 
@@ -35,6 +38,24 @@ import {
 } from "recharts";
 
 export default function Dashboard() {
+  const { t } = useTranslation();
+  const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
+  const [isAddAppointmentModalOpen, setIsAddAppointmentModalOpen] = useState(false);
+
+  const handleAddPatient = (patientData: any) => {
+    console.log("New patient data:", patientData);
+    // Here you would typically send the data to your backend API
+    // For now, we'll just log it and show a success message
+    alert(`تم إضافة المريض ${patientData.name} بنجاح!`);
+  };
+
+  const handleAddAppointment = (appointmentData: any) => {
+    console.log("New appointment data:", appointmentData);
+    // Here you would typically send the data to your backend API
+    // For now, we'll just log it and show a success message
+    alert(`تم تحديد موعد للمريض ${appointmentData.patientName} بنجاح!`);
+  };
+
   // Chart data
   const patientTrendData = [
     { month: "يناير", patients: 120, appointments: 180 },
@@ -67,20 +88,27 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            لوحة التحكم
+            {t('dashboard')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            مرحباً بك في نظام إدارة العيادة - LubbMind
+            {t('welcome')}
           </p>
         </div>
         <div className="flex gap-3">
-          <Button className="flex items-center gap-2">
+          <Button 
+            className="flex items-center gap-2"
+            onClick={() => setIsAddPatientModalOpen(true)}
+          >
             <UserPlus className="h-4 w-4" />
-            مريض جديد
+            {t('newPatient')}
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => setIsAddAppointmentModalOpen(true)}
+          >
             <CalendarPlus className="h-4 w-4" />
-            موعد جديد
+            {t('newAppointment')}
           </Button>
         </div>
       </div>
@@ -329,6 +357,19 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+
+      {/* Add Patient Modal */}
+      <AddPatientModal
+        isOpen={isAddPatientModalOpen}
+        onClose={() => setIsAddPatientModalOpen(false)}
+        onSubmit={handleAddPatient}
+      />
+      
+      <AddAppointmentModal
+        isOpen={isAddAppointmentModalOpen}
+        onClose={() => setIsAddAppointmentModalOpen(false)}
+        onSubmit={handleAddAppointment}
+      />
     </div>
   );
 }

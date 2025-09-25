@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/context/SidebarContext";
+import { I18nProvider } from "@/components/providers/i18n-provider";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -29,16 +30,18 @@ export default function RootLayout({
       <body
         className={`${geist.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SidebarProvider>
-            {children}
-          </SidebarProvider>
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SidebarProvider>
+              {children}
+            </SidebarProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

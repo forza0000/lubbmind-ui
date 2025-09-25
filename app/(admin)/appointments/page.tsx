@@ -215,7 +215,7 @@ export default function Appointments() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
                 <Label htmlFor="patient" className="text-right">
                   اسم المريض
                 </Label>
@@ -237,7 +237,7 @@ export default function Appointments() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
                 <Label htmlFor="doctor" className="text-right">
                   اسم الطبيب
                 </Label>
@@ -249,7 +249,7 @@ export default function Appointments() {
                   placeholder="د. اسم الطبيب"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
                 <Label htmlFor="date" className="text-right">
                   التاريخ
                 </Label>
@@ -261,7 +261,7 @@ export default function Appointments() {
                   className="col-span-3"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
                 <Label htmlFor="time" className="text-right">
                   الوقت
                 </Label>
@@ -273,7 +273,7 @@ export default function Appointments() {
                   className="col-span-3"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
                 <Label htmlFor="status" className="text-right">
                   الحالة
                 </Label>
