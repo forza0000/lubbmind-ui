@@ -262,7 +262,7 @@ export default function Patients() {
 
       {filteredPatients.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">لا توجد نتائج للبحث "{searchTerm}"</p>
+          <p className="text-muted-foreground">لا توجد نتائج للبحث &ldquo;{searchTerm}&rdquo;</p>
         </div>
       )}
     </div>
