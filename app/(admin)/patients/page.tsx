@@ -1,270 +1,260 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Plus, Search } from "lucide-react"
-
-interface Patient {
-  id: string
-  name: string
-  age: number
-  fileNumber: string
-  lastVisit: string
-  phone: string
-  status: "Active" | "Inactive" | "Pending"
-}
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Search, 
+  UserPlus, 
+  Phone, 
+  Mail, 
+  Calendar,
+  FileText,
+  MoreHorizontal,
+  Filter,
+  Download
+} from "lucide-react";
 
 export default function Patients() {
-  const [patients, setPatients] = useState<Patient[]>([
-    {
-      id: "1",
-      name: "أحمد محمد علي",
-      age: 35,
-      fileNumber: "P001",
-      lastVisit: "2024-01-15",
-      phone: "+966501234567",
-      status: "Active"
-    },
-    {
-      id: "2", 
-      name: "فاطمة عبدالله",
-      age: 28,
-      fileNumber: "P002",
-      lastVisit: "2024-01-10",
-      phone: "+966507654321",
-      status: "Active"
-    },
-    {
-      id: "3",
-      name: "محمد سعد الدين",
-      age: 42,
-      fileNumber: "P003", 
-      lastVisit: "2023-12-20",
-      phone: "+966509876543",
-      status: "Inactive"
-    },
-    {
-      id: "4",
-      name: "نورا حسن",
-      age: 31,
-      fileNumber: "P004",
-      lastVisit: "2024-01-12",
-      phone: "+966502468135",
-      status: "Pending"
-    }
-  ])
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [newPatient, setNewPatient] = useState({
-    name: "",
-    age: "",
-    phone: "",
-    status: "Active" as Patient["status"]
-  })
+  const patients = [
+    {
+      id: "P001",
+      name: "أحمد محمد السالم",
+      age: 45,
+      gender: "ذكر",
+      phone: "+966501234567",
+      email: "ahmed.salem@email.com",
+      lastVisit: "2024-01-15",
+      condition: "ضغط الدم",
+      status: "نشط"
+    },
+    {
+      id: "P002", 
+      name: "فاطمة علي أحمد",
+      age: 32,
+      gender: "أنثى",
+      phone: "+966507654321",
+      email: "fatima.ali@email.com",
+      lastVisit: "2024-01-12",
+      condition: "السكري",
+      status: "نشط"
+    },
+    {
+      id: "P003",
+      name: "محمد سالم الأحمد",
+      age: 28,
+      gender: "ذكر", 
+      phone: "+966509876543",
+      email: "mohammed.salem@email.com",
+      lastVisit: "2024-01-10",
+      condition: "فحص دوري",
+      status: "نشط"
+    },
+    {
+      id: "P004",
+      name: "نورا أحمد محمد",
+      age: 55,
+      gender: "أنثى",
+      phone: "+966502468135",
+      email: "nora.ahmed@email.com", 
+      lastVisit: "2024-01-08",
+      condition: "أمراض القلب",
+      status: "متابعة"
+    },
+    {
+      id: "P005",
+      name: "خالد عبدالله الزهراني",
+      age: 38,
+      gender: "ذكر",
+      phone: "+966503691472",
+      email: "khalid.zahrani@email.com",
+      lastVisit: "2024-01-05",
+      condition: "الربو",
+      status: "نشط"
+    }
+  ];
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.fileNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const handleAddPatient = () => {
-    if (newPatient.name && newPatient.age && newPatient.phone) {
-      const patient: Patient = {
-        id: (patients.length + 1).toString(),
-        name: newPatient.name,
-        age: parseInt(newPatient.age),
-        fileNumber: `P${String(patients.length + 1).padStart(3, '0')}`,
-        lastVisit: new Date().toISOString().split('T')[0],
-        phone: newPatient.phone,
-        status: newPatient.status
-      }
-      
-      setPatients([...patients, patient])
-      setNewPatient({ name: "", age: "", phone: "", status: "Active" })
-      setIsDialogOpen(false)
-    }
-  }
-
-  const getStatusColor = (status: Patient["status"]) => {
-    switch (status) {
-      case "Active":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-      case "Inactive":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
-    }
-  }
+    patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">المرضى</h1>
-          <p className="text-muted-foreground">إدارة بيانات المرضى والملفات الطبية</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            إدارة المرضى
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            إدارة ملفات المرضى ومعلوماتهم الطبية
+          </p>
         </div>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              إضافة مريض جديد
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>إضافة مريض جديد</DialogTitle>
-              <DialogDescription>
-                أدخل بيانات المريض الجديد هنا. انقر حفظ عند الانتهاء.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  الاسم
-                </Label>
-                <Input
-                  id="name"
-                  value={newPatient.name}
-                  onChange={(e) => setNewPatient({...newPatient, name: e.target.value})}
-                  className="col-span-3"
-                  placeholder="اسم المريض"
-                />
+        <div className="flex gap-3">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            تصدير البيانات
+          </Button>
+          <Button className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            إضافة مريض جديد
+          </Button>
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">إجمالي المرضى</p>
+                <p className="text-2xl font-bold">1,234</p>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="age" className="text-right">
-                  العمر
-                </Label>
-                <Input
-                  id="age"
-                  type="number"
-                  value={newPatient.age}
-                  onChange={(e) => setNewPatient({...newPatient, age: e.target.value})}
-                  className="col-span-3"
-                  placeholder="العمر"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phone" className="text-right">
-                  الهاتف
-                </Label>
-                <Input
-                  id="phone"
-                  value={newPatient.phone}
-                  onChange={(e) => setNewPatient({...newPatient, phone: e.target.value})}
-                  className="col-span-3"
-                  placeholder="+966xxxxxxxxx"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="status" className="text-right">
-                  الحالة
-                </Label>
-                <Select
-                  value={newPatient.status}
-                  onValueChange={(value: Patient["status"]) => 
-                    setNewPatient({...newPatient, status: value})
-                  }
-                >
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="اختر الحالة" />
-                  </SelectTrigger>
-                  <SelectContent className="z-50">
-                    <SelectItem value="Active">نشط</SelectItem>
-                    <SelectItem value="Inactive">غير نشط</SelectItem>
-                    <SelectItem value="Pending">في الانتظار</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                <UserPlus className="h-6 w-6 text-blue-600" />
               </div>
             </div>
-            <DialogFooter>
-              <Button type="submit" onClick={handleAddPatient}>
-                حفظ المريض
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">مرضى جدد هذا الشهر</p>
+                <p className="text-2xl font-bold">89</p>
+              </div>
+              <div className="h-12 w-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">مرضى نشطون</p>
+                <p className="text-2xl font-bold">987</p>
+              </div>
+              <div className="h-12 w-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
+                <FileText className="h-6 w-6 text-yellow-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">مرضى متابعة</p>
+                <p className="text-2xl font-bold">156</p>
+              </div>
+              <div className="h-12 w-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                <Phone className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Search className="h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="البحث عن مريض..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-      </div>
+      {/* Search and Filter */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="البحث عن مريض (الاسم، الرقم، الحالة)..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pr-10"
+              />
+            </div>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              تصفية
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableCaption>قائمة بجميع المرضى المسجلين في النظام</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-right w-[100px]">رقم الملف</TableHead>
-              <TableHead className="text-right min-w-[150px]">اسم المريض</TableHead>
-              <TableHead className="text-right w-[80px]">العمر</TableHead>
-              <TableHead className="text-right w-[140px]">رقم الهاتف</TableHead>
-              <TableHead className="text-right w-[120px]">آخر زيارة</TableHead>
-              <TableHead className="text-right w-[100px]">الحالة</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {/* Patients List */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>قائمة المرضى ({filteredPatients.length})</span>
+            <Badge variant="secondary">{filteredPatients.length} من {patients.length}</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
             {filteredPatients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell className="font-medium text-right">{patient.fileNumber}</TableCell>
-                <TableCell className="text-right">{patient.name}</TableCell>
-                <TableCell className="text-right">{patient.age} سنة</TableCell>
-                <TableCell className="text-right">{patient.phone}</TableCell>
-                <TableCell className="text-right">{patient.lastVisit}</TableCell>
-                <TableCell className="text-right">
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(patient.status)}`}>
-                    {patient.status === "Active" && "نشط"}
-                    {patient.status === "Inactive" && "غير نشط"}
-                    {patient.status === "Pending" && "في الانتظار"}
-                  </span>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+              <div key={patient.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-semibold text-lg">
+                        {patient.name.split(' ')[0].charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">{patient.name}</h3>
+                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                        <span>رقم المريض: {patient.id}</span>
+                        <span>العمر: {patient.age} سنة</span>
+                        <span>الجنس: {patient.gender}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={patient.status === "نشط" ? "default" : "secondary"}>
+                      {patient.status}
+                    </Badge>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                    <span>{patient.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-400" />
+                    <span>{patient.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span>آخر زيارة: {patient.lastVisit}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-gray-400" />
+                    <span>الحالة: {patient.condition}</span>
+                  </div>
+                </div>
 
-      {filteredPatients.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">لا توجد نتائج للبحث &ldquo;{searchTerm}&rdquo;</p>
-        </div>
-      )}
+                <div className="mt-4 flex gap-2">
+                  <Button size="sm" variant="outline">عرض الملف</Button>
+                  <Button size="sm" variant="outline">تحديد موعد</Button>
+                  <Button size="sm" variant="outline">إنشاء وصفة</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }
