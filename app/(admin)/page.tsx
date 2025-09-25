@@ -12,10 +12,55 @@ import {
   Clock,
   UserPlus,
   CalendarPlus,
-  Stethoscope
+  Stethoscope,
+  BarChart3,
+  PieChart
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from "recharts";
 
 export default function Dashboard() {
+  // Chart data
+  const patientTrendData = [
+    { month: "يناير", patients: 120, appointments: 180 },
+    { month: "فبراير", patients: 135, appointments: 195 },
+    { month: "مارس", patients: 148, appointments: 210 },
+    { month: "أبريل", patients: 162, appointments: 225 },
+    { month: "مايو", patients: 175, appointments: 240 },
+    { month: "يونيو", patients: 190, appointments: 260 },
+  ];
+
+  const appointmentStatusData = [
+    { name: "مكتملة", value: 65, color: "#10B981" },
+    { name: "مجدولة", value: 25, color: "#0EA5E9" },
+    { name: "ملغية", value: 10, color: "#F59E0B" },
+  ];
+
+  const revenueData = [
+    { day: "السبت", revenue: 4500 },
+    { day: "الأحد", revenue: 5200 },
+    { day: "الاثنين", revenue: 4800 },
+    { day: "الثلاثاء", revenue: 6100 },
+    { day: "الأربعاء", revenue: 5500 },
+    { day: "الخميس", revenue: 4900 },
+    { day: "الجمعة", revenue: 3200 },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -94,6 +139,102 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Patient Trends Chart */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              اتجاهات المرضى والمواعيد
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={patientTrendData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="patients" 
+                  stroke="#0EA5E9" 
+                  strokeWidth={2}
+                  name="المرضى"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="appointments" 
+                  stroke="#10B981" 
+                  strokeWidth={2}
+                  name="المواعيد"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Appointment Status Pie Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PieChart className="h-5 w-5" />
+              حالة المواعيد
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <RechartsPieChart>
+                <Pie
+                  data={appointmentStatusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {appointmentStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </RechartsPieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Revenue Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            الإيرادات الأسبوعية
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={revenueData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip formatter={(value) => [`${value} ر.س`, "الإيرادات"]} />
+              <Area 
+                type="monotone" 
+                dataKey="revenue" 
+                stroke="#0EA5E9" 
+                fill="#0EA5E9" 
+                fillOpacity={0.3}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
