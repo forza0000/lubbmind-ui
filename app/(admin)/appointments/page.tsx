@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import AddAppointmentModal from "@/components/modals/AddAppointmentModal"
 import {
   Dialog,
   DialogContent,
@@ -108,6 +109,7 @@ export default function Appointments() {
   ])
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isAddAppointmentModalOpen, setIsAddAppointmentModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [newAppointment, setNewAppointment] = useState({
@@ -155,6 +157,21 @@ export default function Appointments() {
     }
   }
 
+  const handleAddAppointmentModal = (appointmentData: any) => {
+    const appointment: Appointment = {
+      id: (appointments.length + 1).toString(),
+      appointmentId: `A${String(appointments.length + 1).padStart(3, '0')}`,
+      patientName: appointmentData.patientName,
+      doctorName: appointmentData.doctorName || "د. طبيب عام",
+      date: appointmentData.date ? appointmentData.date.toISOString().split('T')[0] : "",
+      time: appointmentData.time,
+      status: "Scheduled"
+    }
+    
+    setAppointments([...appointments, appointment])
+    console.log("New appointment added:", appointmentData)
+  }
+
   const getStatusColor = (status: Appointment["status"]) => {
     switch (status) {
       case "Scheduled":
@@ -200,13 +217,19 @@ export default function Appointments() {
           <p className="text-muted-foreground">إدارة مواعيد المرضى والأطباء</p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              إضافة موعد جديد
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button onClick={() => setIsAddAppointmentModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            إضافة موعد جديد
+          </Button>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Plus className="mr-2 h-4 w-4" />
+                إضافة موعد (بسيط)
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>إضافة موعد جديد</DialogTitle>
@@ -302,6 +325,7 @@ export default function Appointments() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      </div>
       </div>
 
       {/* Statistics Cards */}
@@ -417,6 +441,13 @@ export default function Appointments() {
           </p>
         </div>
       )}
+
+      {/* Add Appointment Modal */}
+      <AddAppointmentModal
+        isOpen={isAddAppointmentModalOpen}
+        onClose={() => setIsAddAppointmentModalOpen(false)}
+        onSubmit={handleAddAppointmentModal}
+      />
     </div>
   )
 }
