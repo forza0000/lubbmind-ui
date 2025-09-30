@@ -43,11 +43,3 @@ export default function RootLayout({
     </html>
   );
 }
-              </div>
-            </main>
-          </div>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
-}
