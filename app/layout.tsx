@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { I18nextProvider } from 'react-i18next';
-import i18n from '@/lib/i18n';
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/sidebar";
+import { I18nProvider } from "@/components/i18n-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +26,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <I18nextProvider i18n={i18n}>
+          <I18nProvider>
             <div className="flex h-screen bg-background">
               <Sidebar />
               <main className="flex-1 overflow-auto lg:ml-0 ml-0">
@@ -37,7 +36,7 @@ export default function RootLayout({
                 </div>
               </main>
             </div>
-          </I18nextProvider>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>
