@@ -2,7 +2,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, CheckCircle, Clock, Users } from 'lucide-react';
+import { Calendar, CircleCheck as CheckCircle, Clock, Users } from 'lucide-react';
 import { useAppointments } from '@/hooks/useAppointments';
 import { format } from 'date-fns';
 

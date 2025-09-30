@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAppointments } from '@/hooks/useAppointments';
-import { CheckCircle } from 'lucide-react';
+import { CircleCheck as CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 // Mock clinic ID - in real app, this would come from auth context
