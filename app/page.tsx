@@ -1,3 +1,5 @@
+"use client"
+
 import { DashboardStats } from '@/components/dashboard-stats';
 import { useTranslation } from 'react-i18next';
 
