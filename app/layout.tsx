@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { GeistSans } from "@vercel/geist/font/sans";
-import { GeistMono } from "@vercel/geist/font/mono";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/sidebar";
 
 const geistSans = GeistSans({
+const inter = Inter({ subsets: ["latin"] });
+
   variable: "--font-geist-sans",
 });
 
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <html lang="en" className={inter.className}>
       >
         <ThemeProvider
           attribute="class"
