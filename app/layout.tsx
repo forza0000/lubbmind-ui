@@ -4,14 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/sidebar";
 
-const geistSans = GeistSans({
-  variable: "--font-geist-sans",
-});
 const inter = Inter({ subsets: ["latin"] });
-
-const geistMono = GeistMono({
-  variable: "--font-geist-mono",
-});
 
 export const metadata: Metadata = {
   title: "LubbMind",
