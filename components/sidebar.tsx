@@ -5,11 +5,14 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { useTranslation } from 'react-i18next'
 import {
   LayoutDashboard,
   Users,
   Calendar,
   FileText,
+  Clock,
   Menu,
   X
 } from "lucide-react"
@@ -17,28 +20,34 @@ import { useState } from "react"
 
 const navigation = [
   {
-    name: "Dashboard",
+    key: "dashboard",
     href: "/",
     icon: LayoutDashboard,
   },
   {
-    name: "Patients",
+    key: "patients",
     href: "/patients",
     icon: Users,
   },
   {
-    name: "Appointments",
+    key: "appointments",
     href: "/appointments",
     icon: Calendar,
   },
   {
-    name: "Reports",
+    key: "waitingRoom",
+    href: "/waiting-room",
+    icon: Clock,
+  },
+  {
+    key: "reports",
     href: "/reports",
     icon: FileText,
   },
 ]
 
 export function Sidebar() {
+  const { t } = useTranslation()
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -76,10 +85,15 @@ export function Sidebar() {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-border">
+          <div className="flex items-center justify-center p-6 border-b border-border">
             <Link href="/" className="flex items-center space-x-2">
               <span className="text-2xl font-bold text-primary">LubbMind</span>
             </Link>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <LanguageSwitcher />
             <ThemeToggle />
           </div>
 
@@ -89,7 +103,7 @@ export function Sidebar() {
               const isActive = pathname === item.href
               return (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
@@ -100,7 +114,7 @@ export function Sidebar() {
                   )}
                 >
                   <item.icon className="h-5 w-5" />
-                  <span>{item.name}</span>
+                  <span>{t(item.key)}</span>
                 </Link>
               )
             })}
