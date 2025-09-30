@@ -5,10 +5,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/sidebar";
 
 const geistSans = GeistSans({
-const inter = Inter({ subsets: ["latin"] });
-
   variable: "--font-geist-sans",
 });
+const inter = Inter({ subsets: ["latin"] });
 
 const geistMono = GeistMono({
   variable: "--font-geist-mono",
@@ -26,9 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-    <html lang="en" className={inter.className}>
-      >
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
